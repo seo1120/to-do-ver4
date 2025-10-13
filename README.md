@@ -1,197 +1,224 @@
-# ✨ 루미의 Todo 리스트 ver2
+# ✨ 루미의 Todo 리스트 ver3 - Full Stack Edition
 
-> React로 만든 예쁘고 기능이 풍부한 투두 앱 💕
+<div align="center">
 
-![React](https://img.shields.io/badge/React-19.2.0-blue)
-![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.0+-38B2AC)
-![Vite](https://img.shields.io/badge/Vite-7.1.9-646CFF)
+![Todo App](https://img.shields.io/badge/Todo-App-pink?style=for-the-badge&logo=react)
+![Express](https://img.shields.io/badge/Backend-Express-green?style=for-the-badge&logo=express)
+![React](https://img.shields.io/badge/Frontend-React-blue?style=for-the-badge&logo=react)
+![Vite](https://img.shields.io/badge/Build-Vite-purple?style=for-the-badge&logo=vite)
 
-## 🎯 프로젝트 개요
+**🎯 할 일을 관리하고 꿈을 이뤄가세요! 💕**
 
-루미의 Todo 리스트 ver2는 React와 Tailwind CSS를 사용하여 만든 현대적이고 사용자 친화적인 할 일 관리 애플리케이션입니다. 드래그 앤 드롭, 다크모드, 반응형 디자인 등 다양한 고급 기능을 포함하고 있습니다.
+[![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-View_App-brightgreen?style=for-the-badge)](https://seo1120.github.io/to-do-ver3/)
+[![API Docs](https://img.shields.io/badge/📚_API_Docs-View_Documentation-orange?style=for-the-badge)](#-api-문서)
 
-## ✨ 주요 기능
+</div>
 
-### 🎨 핵심 CRUD 기능
-- ✅ **Create**: 새로운 할일 추가 (Enter 키 지원)
-- 📖 **Read**: 할일 목록 표시
-- 🔄 **Update**: 완료/미완료 상태 토글
-- 🗑️ **Delete**: 할일 삭제
+---
 
-### 🎯 사용자 경험
-- 📝 빈 상태일 때 안내 메시지
-- ⚠️ 입력 유효성 검사 (빈 문자열 방지)
-- 📊 할일 통계 표시 (전체/완료/진행중 개수)
-- 📈 진행률 바 표시
+## 🌟 프로젝트 소개
 
-### 🔍 필터링 및 검색
-- 🔍 할일 검색 기능
-- 📋 전체/진행중/완료 필터링
-- 🎯 실시간 필터링 결과
+**루미의 Todo 리스트 ver3**는 Express.js 백엔드와 React 프론트엔드가 완벽하게 연동된 Full Stack 웹 애플리케이션입니다! 
 
-### 🎨 고급 UX 기능
-- 🖱️ **드래그 앤 드롭**: 할일 순서 변경
-- 🌙 **다크/라이트 모드**: 테마 전환
-- ✨ **애니메이션**: 부드러운 전환 효과
-- 📱 **반응형 디자인**: 태블릿과 데스크톱 최적화
+이전 버전의 아름다운 UI와 사용자 경험을 그대로 유지하면서, 이제는 서버와 연동되어 데이터가 안전하게 저장됩니다.
 
-### 💾 데이터 관리
-- 💾 **LocalStorage**: 자동 데이터 저장
-- 🔄 **상태 유지**: 페이지 새로고침 시에도 데이터 보존
-- 🗑️ **일괄 작업**: 모두 완료/삭제 기능
-- 🔧 **데이터 초기화**: 저장된 데이터 삭제
+### 🎨 주요 특징
 
-## 🛠️ 기술 스택
+- 🎯 **직관적인 UI/UX** - 드래그 앤 드롭, 검색, 필터링
+- 🌙 **다크/라이트 모드** - 사용자 취향에 맞는 테마
+- ⚡ **실시간 업데이트** - 서버와 실시간 동기화
+- 📱 **반응형 디자인** - 모든 기기에서 완벽한 경험
+- 🔄 **로딩 상태 표시** - 사용자 친화적인 피드백
+- 🛡️ **에러 처리** - 안정적인 사용자 경험
 
-- **Frontend**: React 19.2.0
-- **Styling**: Tailwind CSS
-- **Build Tool**: Vite
-- **Drag & Drop**: @dnd-kit
-- **Icons**: 이모지 및 커스텀 파비콘
+---
 
-## 📦 설치 및 실행
+## 🚀 빠른 시작
 
-### 1. 프로젝트 클론
+### 📋 사전 요구사항
+
+- Node.js (v16 이상)
+- npm 또는 yarn
+
+### ⚡ 1분 만에 실행하기
+
 ```bash
-git clone https://github.com/seo1120/to-do-ver2.git
-cd to-do-ver2
-```
+# 1️⃣ 저장소 클론
+git clone https://github.com/seo1120/to-do-ver3.git
+cd to-do-ver3
 
-### 2. 의존성 설치
-```bash
-npm install
-```
+# 2️⃣ 의존성 설치
+npm install express cors
 
-### 3. 개발 서버 실행
-```bash
+# 3️⃣ 백엔드 서버 실행 (터미널 1)
+node server.js
+
+# 4️⃣ 프론트엔드 실행 (터미널 2)
 npm run dev
 ```
 
-### 4. 빌드
-```bash
-npm run build
+🎉 **완료!** 이제 http://localhost:5173 에서 앱을 확인하세요!
+
+---
+
+## 🎯 주요 기능
+
+### ✨ Todo 관리
+- ➕ **추가**: 새로운 할 일을 쉽게 추가
+- ✏️ **수정**: 완료 상태 토글 및 텍스트 수정
+- 🗑️ **삭제**: 개별 또는 일괄 삭제
+- 🔄 **정렬**: 드래그 앤 드롭으로 순서 변경
+
+### 🔍 검색 & 필터
+- 🔍 **실시간 검색**: 타이핑하는 즉시 결과 표시
+- 📊 **상태별 필터**: 전체/진행중/완료된 항목만 보기
+- 📈 **진행률 표시**: 시각적인 완료율 표시
+
+### 🎨 사용자 경험
+- 🌙 **다크 모드**: 눈에 편한 다크 테마
+- 📱 **반응형**: 모바일부터 데스크톱까지
+- ⚡ **빠른 로딩**: 최적화된 성능
+- 🔄 **실시간 동기화**: 서버와 즉시 동기화
+
+---
+
+## 🛠️ 기술 스택
+
+### Backend
+- **Express.js** - 빠르고 유연한 웹 프레임워크
+- **CORS** - 크로스 오리진 요청 처리
+- **RESTful API** - 표준화된 API 설계
+
+### Frontend
+- **React 19** - 최신 React 기능 활용
+- **Vite** - 빠른 개발 서버와 빌드
+- **Axios** - HTTP 클라이언트
+- **@dnd-kit** - 드래그 앤 드롭 기능
+- **Tailwind CSS** - 유틸리티 우선 CSS
+
+### 개발 도구
+- **ESLint** - 코드 품질 관리
+- **Git** - 버전 관리
+- **GitHub Pages** - 무료 호스팅
+
+---
+
+## 📚 API 문서
+
+### 🔗 기본 URL
+```
+http://localhost:3002/api
 ```
 
-## 🎨 디자인 특징
+### 📋 엔드포인트
 
-### 🎯 색상 테마
-- **라이트 모드**: 연한 핑크 배경 (`bg-pink-50`)
-- **다크 모드**: 진한 회색 배경 (`bg-gray-900`)
-- **버튼**: 연한 핑크 (`bg-pink-300`) → 진한 핑크 (`hover:bg-pink-500`)
+| Method | Endpoint | 설명 | 요청 본문 |
+|--------|----------|------|-----------|
+| `GET` | `/todos` | 모든 Todo 조회 | - |
+| `POST` | `/todos` | 새 Todo 생성 | `{"text": "할 일"}` |
+| `PUT` | `/todos/:id` | Todo 수정 | `{"completed": true}` |
+| `DELETE` | `/todos/:id` | Todo 삭제 | - |
 
-### 🎨 UI/UX
-- **글래스모피즘**: 반투명 카드 디자인
-- **부드러운 애니메이션**: 호버 효과와 전환
-- **직관적인 아이콘**: 이모지와 시각적 피드백
-- **반응형 레이아웃**: 모바일부터 데스크톱까지
+### 📝 응답 예시
+
+```json
+{
+  "success": true,
+  "count": 3,
+  "data": [
+    {
+      "id": 1,
+      "text": "Express 서버 만들기",
+      "completed": false
+    }
+  ]
+}
+```
+
+---
+
+## 🧪 테스트 방법
+
+### 1️⃣ 브라우저 테스트
+- http://localhost:3002/api/todos - API 직접 확인
+- http://localhost:5173 - React 앱 테스트
+
+### 2️⃣ API 테스트 도구
+- **Thunder Client** (VS Code 확장)
+- **Postman**
+- **curl** 명령어
+
+### 3️⃣ 기능 테스트
+- ✅ Todo 추가/수정/삭제
+- ✅ 검색 및 필터링
+- ✅ 드래그 앤 드롭
+- ✅ 다크 모드 전환
+
+---
 
 ## 📁 프로젝트 구조
 
 ```
-src/
-├── components/
-│   ├── TodoApp.jsx      # 메인 앱 컴포넌트
-│   ├── TodoList.jsx     # 드래그 앤 드롭 리스트
-│   └── TodoItem.jsx     # 개별 투두 아이템
-├── main.jsx             # 엔트리 포인트
-├── index.css            # 전역 스타일
-└── App.css              # (삭제됨 - Tailwind 사용)
-
-public/
-├── pink-dot-star96.png  # 커스텀 파비콘
-└── vite.svg             # (삭제됨)
+to-do-ver3/
+├── 🚀 server.js              # Express 서버
+├── 📦 package.json           # 프로젝트 설정
+├── 📖 README.md              # 프로젝트 문서
+├── 📁 src/
+│   ├── 🎯 TodoApp.jsx        # 메인 컴포넌트
+│   ├── 📋 TodoList.jsx       # Todo 목록
+│   ├── 📝 TodoItem.jsx       # 개별 Todo
+│   └── 📁 services/
+│       └── 🔌 todoService.js # API 통신
+└── 📁 public/                # 정적 파일
 ```
-
-## 🎯 주요 컴포넌트
-
-### TodoApp.jsx
-- 메인 애플리케이션 로직
-- 상태 관리 (todos, filter, search, darkMode)
-- LocalStorage 연동
-- 통계 계산
-
-### TodoList.jsx
-- 드래그 앤 드롭 구현
-- @dnd-kit 라이브러리 사용
-- 필터링된 투두 목록 렌더링
-
-### TodoItem.jsx
-- 개별 투두 아이템 표시
-- 완료/미완료 토글
-- 삭제 기능
-- 드래그 핸들
-
-## 🚀 고급 기능 구현
-
-### 드래그 앤 드롭
-```javascript
-// @dnd-kit을 사용한 드래그 앤 드롭
-import { DndContext, SortableContext } from '@dnd-kit/sortable';
-```
-
-### 다크모드
-```javascript
-// LocalStorage에 다크모드 상태 저장
-useEffect(() => {
-  localStorage.setItem('dark-mode', JSON.stringify(isDarkMode));
-  document.body.classList.toggle('dark', isDarkMode);
-}, [isDarkMode]);
-```
-
-### 반응형 디자인
-```css
-/* Tailwind CSS 반응형 클래스 */
-className="grid grid-cols-1 md:grid-cols-2 gap-4"
-```
-
-## 📱 반응형 디자인
-
-- **모바일**: 1열 그리드, 세로 레이아웃
-- **태블릿**: 2열 그리드, 혼합 레이아웃
-- **데스크톱**: 최적화된 레이아웃, 큰 화면 활용
-
-## 🎨 커스터마이징
-
-### 색상 변경
-```css
-/* index.css에서 전체 배경색 변경 */
-body {
-  background-color: #fdf2f8; /* 연한 핑크 */
-}
-
-body.dark {
-  background-color: #111827; /* 진한 회색 */
-}
-```
-
-### 버튼 색상
-```javascript
-// TodoApp.jsx에서 버튼 색상 변경
-className="bg-pink-300 hover:bg-pink-500"
-```
-
-## 🐛 알려진 이슈
-
-- 드래그 앤 드롭 시 일부 브라우저에서 성능 최적화 필요
-- 모바일에서 드래그 감도 조정 가능
-
-## 🔮 향후 계획
-
-- [ ] 카테고리별 할일 분류
-- [ ] 마감일 설정 기능
-- [ ] 할일 우선순위 설정
-- [ ] 데이터 내보내기/가져오기
-- [ ] PWA 지원
-
-## 📄 라이선스
-
-이 프로젝트는 MIT 라이선스 하에 배포됩니다.
-
-## 👨‍💻 개발자
-
-**루미** - Full-stack Developer
-- GitHub: [@seo1120](https://github.com/seo1120)
 
 ---
 
-💕 **루미의 Todo 리스트 ver2**로 할 일을 관리하고 꿈을 이뤄가세요! ✨
+## 🎨 스크린샷
+
+<div align="center">
+
+### 🌞 라이트 모드
+![Light Mode](https://via.placeholder.com/600x400/FFB6C1/FFFFFF?text=Light+Mode+Preview)
+
+### 🌙 다크 모드  
+![Dark Mode](https://via.placeholder.com/600x400/2D3748/FFFFFF?text=Dark+Mode+Preview)
+
+</div>
+
+---
+
+## 🤝 기여하기
+
+프로젝트에 기여하고 싶으시다면:
+
+1. 🍴 **Fork** 이 저장소
+2. 🌿 **브랜치 생성** (`git checkout -b feature/amazing-feature`)
+3. 💾 **커밋** (`git commit -m 'Add amazing feature'`)
+4. 📤 **푸시** (`git push origin feature/amazing-feature`)
+5. 🔄 **Pull Request** 생성
+
+---
+
+## 📄 라이선스
+
+이 프로젝트는 MIT 라이선스 하에 배포됩니다. 자세한 내용은 [LICENSE](LICENSE) 파일을 참조하세요.
+
+---
+
+## 👨‍💻 개발자
+
+**서현** - Full Stack Developer
+
+- 🌐 GitHub: [@seo1120](https://github.com/seo1120)
+- 📧 이메일: [연락처]
+
+---
+
+<div align="center">
+
+**⭐ 이 프로젝트가 도움이 되었다면 스타를 눌러주세요! ⭐**
+
+Made with ❤️ by 서현
+
+</div>
