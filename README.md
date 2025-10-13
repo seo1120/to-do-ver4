@@ -1,4 +1,4 @@
-# ✨ 루미의 Todo 리스트 ver3 - Full Stack Edition
+# ✨ 루미의 Todo 리스트 ver3
 
 <div align="center">
 
