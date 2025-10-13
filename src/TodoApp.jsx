@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { arrayMove } from '@dnd-kit/sortable';
 import TodoList from './TodoList';
 import starImage from './assets/pink-dot-star96.png';
+import { todoService } from './services/todoService';
 
 function TodoApp() {
   const [todos, setTodos] = useState([]);
@@ -9,17 +10,15 @@ function TodoApp() {
   const [filter, setFilter] = useState('all'); // 'all', 'active', 'completed'
   const [searchText, setSearchText] = useState('');
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  // LocalStorage에서 데이터 로드 (컴포넌트 마운트 시 한 번만)
+  // 서버에서 데이터 로드 (컴포넌트 마운트 시 한 번만)
   useEffect(() => {
-    console.log('=== 컴포넌트 마운트: LocalStorage 로드 시작 ===');
-    const savedTodos = localStorage.getItem('react-todos');
+    console.log('=== 컴포넌트 마운트: 서버에서 데이터 로드 시작 ===');
+    
+    // 다크모드 설정 로드 (로컬스토리지에서)
     const savedDarkMode = localStorage.getItem('dark-mode');
-    
-    console.log('저장된 데이터:', savedTodos);
-    console.log('저장된 다크모드:', savedDarkMode);
-    
-    // 다크모드 설정 로드
     if (savedDarkMode) {
       const darkModeValue = JSON.parse(savedDarkMode);
       setIsDarkMode(darkModeValue);
@@ -32,36 +31,36 @@ function TodoApp() {
       }
     }
     
-    if (savedTodos && savedTodos !== '[]') {
-      try {
-        const parsedTodos = JSON.parse(savedTodos);
-        console.log('파싱된 데이터:', parsedTodos);
-        if (Array.isArray(parsedTodos) && parsedTodos.length > 0) {
-          setTodos(parsedTodos);
-          console.log('✅ 데이터 로드 성공:', parsedTodos);
-        } else {
-          console.log('빈 배열이므로 로드하지 않음');
-        }
-      } catch (error) {
-        console.error('파싱 에러:', error);
-        setTodos([]);
-      }
-    } else {
-      console.log('저장된 데이터가 없음');
-    }
+    // 서버에서 Todo 데이터 로드
+    loadTodos();
   }, []);
 
-  // todos 상태가 변경될 때마다 저장
+  // 서버에서 Todo 데이터 로드 함수
+  const loadTodos = async () => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const result = await todoService.getAllTodos();
+      if (result.success) {
+        setTodos(result.data);
+        console.log('✅ 서버에서 데이터 로드 성공:', result.data);
+      } else {
+        setError(result.error);
+        console.error('❌ 서버 데이터 로드 실패:', result.error);
+      }
+    } catch (error) {
+      setError('서버 연결에 실패했습니다. 서버가 실행 중인지 확인해주세요.');
+      console.error('❌ 서버 연결 실패:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // todos 상태 변경 로깅 (서버 연동으로 인해 localStorage 저장 제거)
   useEffect(() => {
     console.log('=== todos 변경됨:', todos);
     console.log('todos 길이:', todos.length);
-    
-    if (todos.length > 0) {
-      localStorage.setItem('react-todos', JSON.stringify(todos));
-      console.log('✅ LocalStorage에 저장됨:', todos);
-    } else {
-      console.log('빈 배열이므로 저장하지 않음');
-    }
   }, [todos]);
 
   // 다크모드 상태 저장 및 body 클래스 업데이트
@@ -76,24 +75,79 @@ function TodoApp() {
     }
   }, [isDarkMode]);
 
-  const addTodo = () => {
+  const addTodo = async () => {
     const trimmedText = inputText.trim();
-    if (trimmedText !== '') {
-      setTodos(prevTodos => [...prevTodos, { text: trimmedText, completed: false }]);
-      setInputText('');
-    } else {
+    if (trimmedText === '') {
       alert('할 일을 입력해주세요!');
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const result = await todoService.createTodo(trimmedText);
+      if (result.success) {
+        setTodos(prevTodos => [result.data, ...prevTodos]);
+        setInputText('');
+        console.log('✅ Todo 추가 성공:', result.data);
+      } else {
+        setError(result.error);
+        alert(`Todo 추가 실패: ${result.error}`);
+      }
+    } catch (error) {
+      setError('서버 연결에 실패했습니다.');
+      alert('서버 연결에 실패했습니다. 서버가 실행 중인지 확인해주세요.');
+      console.error('❌ Todo 추가 실패:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const toggleTodo = (todoToToggle) => {
-    setTodos(todos.map(todo => 
-      todo === todoToToggle ? { ...todo, completed: !todo.completed } : todo
-    ));
+  const toggleTodo = async (todoToToggle) => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const result = await todoService.toggleTodo(todoToToggle.id, !todoToToggle.completed);
+      if (result.success) {
+        setTodos(todos.map(todo => 
+          todo.id === todoToToggle.id ? result.data : todo
+        ));
+        console.log('✅ Todo 상태 변경 성공:', result.data);
+      } else {
+        setError(result.error);
+        alert(`Todo 상태 변경 실패: ${result.error}`);
+      }
+    } catch (error) {
+      setError('서버 연결에 실패했습니다.');
+      alert('서버 연결에 실패했습니다. 서버가 실행 중인지 확인해주세요.');
+      console.error('❌ Todo 상태 변경 실패:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const deleteTodo = (todoToDelete) => {
-    setTodos(todos.filter(todo => todo !== todoToDelete));
+  const deleteTodo = async (todoToDelete) => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const result = await todoService.deleteTodo(todoToDelete.id);
+      if (result.success) {
+        setTodos(todos.filter(todo => todo.id !== todoToDelete.id));
+        console.log('✅ Todo 삭제 성공:', todoToDelete);
+      } else {
+        setError(result.error);
+        alert(`Todo 삭제 실패: ${result.error}`);
+      }
+    } catch (error) {
+      setError('서버 연결에 실패했습니다.');
+      alert('서버 연결에 실패했습니다. 서버가 실행 중인지 확인해주세요.');
+      console.error('❌ Todo 삭제 실패:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const reorderTodos = (oldIndex, newIndex) => {
@@ -101,18 +155,62 @@ function TodoApp() {
   };
 
   // 일괄 작업 함수들
-  const completeAll = () => {
-    setTodos(todos.map(todo => ({ ...todo, completed: true })));
+  const completeAll = async () => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      // 모든 미완료 Todo를 완료로 변경
+      const incompleteTodos = todos.filter(todo => !todo.completed);
+      const updatePromises = incompleteTodos.map(todo => 
+        todoService.updateTodo(todo.id, { completed: true })
+      );
+      
+      const results = await Promise.all(updatePromises);
+      const successfulUpdates = results.filter(result => result.success);
+      
+      if (successfulUpdates.length > 0) {
+        // 성공한 업데이트들을 반영
+        const updatedTodos = todos.map(todo => {
+          const update = successfulUpdates.find(result => result.data.id === todo.id);
+          return update ? update.data : todo;
+        });
+        setTodos(updatedTodos);
+        console.log('✅ 모든 Todo 완료 처리 성공');
+      }
+    } catch (error) {
+      setError('일부 Todo 완료 처리에 실패했습니다.');
+      alert('일부 Todo 완료 처리에 실패했습니다.');
+      console.error('❌ Todo 일괄 완료 처리 실패:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const deleteAll = () => {
-    setTodos([]);
-  };
+  const deleteAll = clearAllTodos; // 기존 함수명 유지
 
-  const clearLocalStorage = () => {
-    localStorage.removeItem('react-todos');
-    setTodos([]);
-    console.log('LocalStorage cleared');
+  const clearAllTodos = async () => {
+    if (!confirm('모든 Todo를 삭제하시겠습니까?')) {
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      // 모든 Todo를 하나씩 삭제
+      const deletePromises = todos.map(todo => todoService.deleteTodo(todo.id));
+      await Promise.all(deletePromises);
+      
+      setTodos([]);
+      console.log('✅ 모든 Todo 삭제 성공');
+    } catch (error) {
+      setError('일부 Todo 삭제에 실패했습니다.');
+      alert('일부 Todo 삭제에 실패했습니다.');
+      console.error('❌ Todo 일괄 삭제 실패:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const toggleDarkMode = () => {
@@ -152,13 +250,43 @@ function TodoApp() {
               alt="루미" 
               className="w-8 h-8 md:w-10 md:h-10"
             />
-            루미의 Todo 리스트 ver2
+            루미의 Todo 리스트 ver3 (Full Stack)
           </h1>
           <p className={`text-sm ${
             isDarkMode ? 'text-gray-300' : 'text-gray-600'
           }`}>
             할 일을 관리하고 꿈을 이뤄가세요! 💕
           </p>
+          
+          {/* 로딩 상태 표시 */}
+          {loading && (
+            <div className={`mt-4 p-3 rounded-lg ${
+              isDarkMode ? 'bg-blue-900/50 text-blue-300' : 'bg-blue-50 text-blue-600'
+            }`}>
+              <div className="flex items-center justify-center gap-2">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
+                <span className="text-sm">처리 중...</span>
+              </div>
+            </div>
+          )}
+          
+          {/* 에러 메시지 표시 */}
+          {error && (
+            <div className={`mt-4 p-3 rounded-lg ${
+              isDarkMode ? 'bg-red-900/50 text-red-300' : 'bg-red-50 text-red-600'
+            }`}>
+              <div className="flex items-center justify-center gap-2">
+                <span>⚠️</span>
+                <span className="text-sm">{error}</span>
+                <button 
+                  onClick={() => setError(null)}
+                  className="ml-2 text-xs underline hover:no-underline"
+                >
+                  닫기
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       
       <form onSubmit={(e) => {
@@ -184,9 +312,14 @@ function TodoApp() {
             />
             <button 
               type="submit"
-              className="w-full md:w-auto px-6 py-3 bg-pink-300 hover:bg-pink-500 text-white rounded-xl font-medium transition-all duration-300 shadow-lg hover:shadow-pink-200 hover:scale-105"
+              disabled={loading}
+              className={`w-full md:w-auto px-6 py-3 rounded-xl font-medium transition-all duration-300 shadow-lg ${
+                loading 
+                  ? 'bg-gray-400 cursor-not-allowed' 
+                  : 'bg-pink-300 hover:bg-pink-500 hover:shadow-pink-200 hover:scale-105'
+              } text-white`}
             >
-              ✨ 추가하기
+              {loading ? '⏳ 처리 중...' : '✨ 추가하기'}
             </button>
           </div>
         </div>
@@ -320,17 +453,20 @@ function TodoApp() {
       )}
       </div>
       
-      {/* 데이터 초기화 버튼 - 작게 맨 밑에 */}
-      {totalTodos > 0 && (
-        <div className="text-center mt-8 mb-4">
-          <button 
-            onClick={clearLocalStorage} 
-            className="text-xs px-3 py-1 rounded-full bg-pink-300 hover:bg-pink-500 text-white transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-pink-200"
-          >
-            데이터 초기화
-          </button>
-        </div>
-      )}
+      {/* 서버 재연결 버튼 - 작게 맨 밑에 */}
+      <div className="text-center mt-8 mb-4">
+        <button 
+          onClick={loadTodos} 
+          disabled={loading}
+          className={`text-xs px-3 py-1 rounded-full transition-all duration-300 shadow-lg ${
+            loading 
+              ? 'bg-gray-400 cursor-not-allowed' 
+              : 'bg-pink-300 hover:bg-pink-500 hover:scale-105 hover:shadow-pink-200'
+          } text-white`}
+        >
+          {loading ? '⏳ 연결 중...' : '🔄 서버 재연결'}
+        </button>
+      </div>
       
       {/* 오른쪽 하단 고정 다크모드 버튼 */}
       <button
