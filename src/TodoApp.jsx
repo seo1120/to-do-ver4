@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { arrayMove } from '@dnd-kit/sortable';
 import TodoList from './TodoList';
-import starImage from './assets/pink-dot-star96.png';
+import starImage from '/pink-dot-star96.png';
 import { todoService } from './services/todoService';
 
 function TodoApp() {
@@ -186,8 +186,6 @@ function TodoApp() {
       setLoading(false);
     }
   };
-
-  const deleteAll = clearAllTodos; // 기존 함수명 유지
 
   const clearAllTodos = async () => {
     if (!confirm('모든 Todo를 삭제하시겠습니까?')) {
@@ -426,7 +424,7 @@ function TodoApp() {
             모두 완료
           </button>
           <button 
-            onClick={deleteAll} 
+            onClick={clearAllTodos} 
             className="px-6 py-3 bg-blue-300 hover:bg-blue-500 text-white rounded-xl font-medium transition-all duration-300 shadow-lg hover:shadow-pink-200 hover:scale-105"
           >
             모두 삭제

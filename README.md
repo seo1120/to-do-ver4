@@ -4,6 +4,7 @@
 
 ![Todo App](https://img.shields.io/badge/Todo-App-pink?style=for-the-badge&logo=react)
 ![Express](https://img.shields.io/badge/Backend-Express-green?style=for-the-badge&logo=express)
+![SQLite](https://img.shields.io/badge/Database-SQLite-blue?style=for-the-badge&logo=sqlite)
 ![React](https://img.shields.io/badge/Frontend-React-blue?style=for-the-badge&logo=react)
 ![Vite](https://img.shields.io/badge/Build-Vite-purple?style=for-the-badge&logo=vite)
 
@@ -20,13 +21,14 @@
 
 **루미의 Todo 리스트 ver3**는 Express.js 백엔드와 React 프론트엔드가 완벽하게 연동된 Full Stack 웹 애플리케이션입니다! 
 
-이전 버전의 아름다운 UI와 사용자 경험을 그대로 유지하면서, 이제는 서버와 연동되어 데이터가 안전하게 저장됩니다.
+이전 버전의 아름다운 UI와 사용자 경험을 그대로 유지하면서, 이제는 **SQLite 데이터베이스**와 연동되어 데이터가 영구적으로 안전하게 저장됩니다.
 
 ### 🎨 주요 특징
 
 - 🎯 **직관적인 UI/UX** - 드래그 앤 드롭, 검색, 필터링
 - 🌙 **다크/라이트 모드** - 사용자 취향에 맞는 테마
 - ⚡ **실시간 업데이트** - 서버와 실시간 동기화
+- 💾 **영구 데이터 저장** - SQLite 데이터베이스로 안전한 저장
 - 📱 **반응형 디자인** - 모든 기기에서 완벽한 경험
 - 🔄 **로딩 상태 표시** - 사용자 친화적인 피드백
 - 🛡️ **에러 처리** - 안정적인 사용자 경험
@@ -48,7 +50,7 @@ git clone https://github.com/seo1120/to-do-ver3.git
 cd to-do-ver3
 
 # 2️⃣ 의존성 설치
-npm install express cors
+npm install
 
 # 3️⃣ 백엔드 서버 실행 (터미널 1)
 node server.js
@@ -57,7 +59,11 @@ node server.js
 npm run dev
 ```
 
-🎉 **완료!** 이제 http://localhost:5173 에서 앱을 확인하세요!
+🎉 **완료!** 이제 http://localhost:3001 에서 앱을 확인하세요!
+
+**📍 접속 주소:**
+- 🌐 **프론트엔드**: http://localhost:3001
+- 🔧 **백엔드 API**: http://localhost:3002/api/todos
 
 ---
 
@@ -86,6 +92,7 @@ npm run dev
 
 ### Backend
 - **Express.js** - 빠르고 유연한 웹 프레임워크
+- **SQLite** - 경량화된 관계형 데이터베이스
 - **CORS** - 크로스 오리진 요청 처리
 - **RESTful API** - 표준화된 API 설계
 
@@ -137,11 +144,33 @@ http://localhost:3002/api
 
 ---
 
+## 💾 데이터베이스 정보
+
+### SQLite 데이터베이스
+- **파일 위치**: `./todos.db`
+- **테이블 구조**:
+  ```sql
+  CREATE TABLE todos (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    text TEXT NOT NULL,
+    completed BOOLEAN DEFAULT 0,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
+  ```
+
+### 데이터 관리
+- ✅ **자동 초기화**: 서버 시작 시 테이블 자동 생성
+- ✅ **영구 저장**: 서버 재시작해도 데이터 유지
+- ✅ **백업**: `todos.db` 파일 복사로 간단한 백업
+- ✅ **확장성**: VS Code SQLite 확장으로 데이터 확인 가능
+
+---
+
 ## 🧪 테스트 방법
 
 ### 1️⃣ 브라우저 테스트
 - http://localhost:3002/api/todos - API 직접 확인
-- http://localhost:5173 - React 앱 테스트
+- http://localhost:3001 - React 앱 테스트
 
 ### 2️⃣ API 테스트 도구
 - **Thunder Client** (VS Code 확장)
@@ -160,9 +189,11 @@ http://localhost:3002/api
 
 ```
 to-do-ver3/
-├── 🚀 server.js              # Express 서버
+├── 🚀 server.js              # Express 서버 (SQLite 연동)
+├── 💾 todos.db               # SQLite 데이터베이스
 ├── 📦 package.json           # 프로젝트 설정
 ├── 📖 README.md              # 프로젝트 문서
+├── ⚙️ vite.config.js         # Vite 설정 (포트 3001)
 ├── 📁 src/
 │   ├── 🎯 TodoApp.jsx        # 메인 컴포넌트
 │   ├── 📋 TodoList.jsx       # Todo 목록
@@ -185,6 +216,44 @@ to-do-ver3/
 ![Dark Mode](https://via.placeholder.com/600x400/2D3748/FFFFFF?text=Dark+Mode+Preview)
 
 </div>
+
+---
+
+## 🔧 문제 해결
+
+### 자주 발생하는 문제들
+
+#### 1️⃣ 포트 충돌
+```bash
+# 포트 사용 확인
+lsof -i :3001  # 프론트엔드
+lsof -i :3002  # 백엔드
+
+# 프로세스 종료
+pkill -f "node server.js"
+pkill -f "vite"
+```
+
+#### 2️⃣ 데이터베이스 파일 문제
+```bash
+# SQLite 파일 확인
+ls -la todos.db
+
+# 데이터베이스 초기화 (주의: 모든 데이터 삭제)
+rm todos.db
+node server.js  # 자동으로 새 파일 생성
+```
+
+#### 3️⃣ 의존성 문제
+```bash
+# 클린 설치
+rm -rf node_modules package-lock.json
+npm install
+```
+
+#### 4️⃣ 브라우저 캐시 문제
+- 개발자 도구 (F12) → Application → Storage → Clear storage
+- 또는 하드 새로고침 (Ctrl+Shift+R)
 
 ---
 
