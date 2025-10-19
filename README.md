@@ -1,16 +1,16 @@
-# ✨ 루미의 Todo 리스트 ver3
+# ✨ 루미의 Todo 리스트 ver4
 
 <div align="center">
 
 ![Todo App](https://img.shields.io/badge/Todo-App-pink?style=for-the-badge&logo=react)
 ![Express](https://img.shields.io/badge/Backend-Express-green?style=for-the-badge&logo=express)
-![SQLite](https://img.shields.io/badge/Database-SQLite-blue?style=for-the-badge&logo=sqlite)
+![Supabase](https://img.shields.io/badge/Database-Supabase-green?style=for-the-badge&logo=supabase)
 ![React](https://img.shields.io/badge/Frontend-React-blue?style=for-the-badge&logo=react)
 ![Vite](https://img.shields.io/badge/Build-Vite-purple?style=for-the-badge&logo=vite)
 
 **🎯 할 일을 관리하고 꿈을 이뤄가세요! 💕**
 
-[![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-View_App-brightgreen?style=for-the-badge)](https://seo1120.github.io/to-do-ver3/)
+[![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-View_App-brightgreen?style=for-the-badge)](https://seo1120.github.io/to-do-ver4/)
 [![API Docs](https://img.shields.io/badge/📚_API_Docs-View_Documentation-orange?style=for-the-badge)](#-api-문서)
 
 </div>
@@ -19,16 +19,16 @@
 
 ## 🌟 프로젝트 소개
 
-**루미의 Todo 리스트 ver3**는 Express.js 백엔드와 React 프론트엔드가 완벽하게 연동된 Full Stack 웹 애플리케이션입니다! 
+**루미의 Todo 리스트 ver4**는 Express.js 백엔드와 React 프론트엔드가 완벽하게 연동된 Full Stack 웹 애플리케이션입니다! 
 
-이전 버전의 아름다운 UI와 사용자 경험을 그대로 유지하면서, 이제는 **SQLite 데이터베이스**와 연동되어 데이터가 영구적으로 안전하게 저장됩니다.
+이전 버전의 아름다운 UI와 사용자 경험을 그대로 유지하면서, 이제는 **Supabase PostgreSQL 데이터베이스**와 연동되어 클라우드에서 데이터가 안전하게 저장됩니다.
 
 ### 🎨 주요 특징
 
 - 🎯 **직관적인 UI/UX** - 드래그 앤 드롭, 검색, 필터링
 - 🌙 **다크/라이트 모드** - 사용자 취향에 맞는 테마
 - ⚡ **실시간 업데이트** - 서버와 실시간 동기화
-- 💾 **영구 데이터 저장** - SQLite 데이터베이스로 안전한 저장
+- 💾 **클라우드 데이터 저장** - Supabase PostgreSQL로 안전한 클라우드 저장
 - 📱 **반응형 디자인** - 모든 기기에서 완벽한 경험
 - 🔄 **로딩 상태 표시** - 사용자 친화적인 피드백
 - 🛡️ **에러 처리** - 안정적인 사용자 경험
@@ -41,21 +41,58 @@
 
 - Node.js (v16 이상)
 - npm 또는 yarn
+- Supabase 계정 (무료)
+
+### 🚀 Supabase 설정
+
+#### 1️⃣ Supabase 프로젝트 생성
+1. [Supabase](https://supabase.com)에 가입/로그인
+2. "New Project" 클릭
+3. 프로젝트 이름과 데이터베이스 비밀번호 설정
+4. 프로젝트 생성 완료 후 대기 (약 2-3분)
+
+#### 2️⃣ 데이터베이스 테이블 생성
+1. Supabase 대시보드 → SQL Editor
+2. `supabase-setup.sql` 파일의 내용을 복사하여 실행
+3. 또는 Table Editor에서 수동으로 `todos` 테이블 생성
+
+#### 3️⃣ 환경 변수 설정
+프로젝트 루트에 `.env` 파일을 생성하고 다음 내용을 입력하세요:
+
+```bash
+# .env.example 파일을 .env로 복사
+cp .env.example .env
+```
+
+`.env` 파일에서 Supabase URL과 키를 실제 값으로 수정하세요:
+```env
+SUPABASE_URL=your_supabase_project_url
+SUPABASE_ANON_KEY=your_supabase_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
+PORT=3002
+```
 
 ### ⚡ 1분 만에 실행하기
 
 ```bash
 # 1️⃣ 저장소 클론
-git clone https://github.com/seo1120/to-do-ver3.git
-cd to-do-ver3
+git clone https://github.com/seo1120/to-do-ver4.git
+cd to-do-ver4
 
 # 2️⃣ 의존성 설치
 npm install
 
-# 3️⃣ 백엔드 서버 실행 (터미널 1)
+# 3️⃣ 환경 변수 설정
+cp .env.example .env
+# .env 파일에서 Supabase URL과 키를 실제 값으로 수정
+
+# 4️⃣ Supabase 테이블 생성
+# supabase-setup.sql 파일을 Supabase SQL Editor에서 실행
+
+# 5️⃣ 백엔드 서버 실행 (터미널 1)
 node server.js
 
-# 4️⃣ 프론트엔드 실행 (터미널 2)
+# 6️⃣ 프론트엔드 실행 (터미널 2)
 npm run dev
 ```
 
