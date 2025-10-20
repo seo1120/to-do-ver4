@@ -5,6 +5,7 @@ import AuthForm from './AuthForm';
 import starImage from '/pink-dot-star96.png';
 import { todoService } from './services/todoService';
 import { authService } from './services/authService';
+import { breakDownTask } from './services/aiService';
 
 function TodoApp() {
   const [todos, setTodos] = useState([]);
@@ -14,6 +15,11 @@ function TodoApp() {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  
+  // AI 관련 상태
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiSteps, setAiSteps] = useState([]);
+  const [showAiSteps, setShowAiSteps] = useState(false);
   
   // 인증 관련 상태
   const [user, setUser] = useState(null);
@@ -135,6 +141,58 @@ function TodoApp() {
       setError('서버 연결에 실패했습니다.');
       alert('서버 연결에 실패했습니다. 서버가 실행 중인지 확인해주세요.');
       console.error('❌ Todo 추가 실패:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // AI 할 일 분해 함수
+  const handleAiBreakdown = async () => {
+    const trimmedText = inputText.trim();
+    if (trimmedText === '') {
+      alert('분해할 할 일을 입력해주세요!');
+      return;
+    }
+
+    setAiLoading(true);
+    setError(null);
+
+    try {
+      const result = await breakDownTask(trimmedText);
+      if (result.success) {
+        setAiSteps(result.steps);
+        setShowAiSteps(true);
+        console.log('✅ AI 분해 성공:', result.steps);
+      } else {
+        setError(result.error);
+        alert(`AI 분해 실패: ${result.error}`);
+      }
+    } catch (error) {
+      setError('AI 서비스 연결에 실패했습니다.');
+      alert('AI 서비스 연결에 실패했습니다. 서버가 실행 중인지 확인해주세요.');
+      console.error('❌ AI 분해 실패:', error);
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
+  // AI 단계를 개별 Todo로 추가하는 함수
+  const addAiStepsAsTodos = async () => {
+    setLoading(true);
+    try {
+      for (const step of aiSteps) {
+        const result = await todoService.createTodo(step);
+        if (result.success) {
+          setTodos(prevTodos => [result.data, ...prevTodos]);
+        }
+      }
+      setShowAiSteps(false);
+      setAiSteps([]);
+      setInputText('');
+      console.log('✅ AI 단계들이 Todo로 추가됨');
+    } catch (error) {
+      console.error('❌ AI 단계 추가 실패:', error);
+      alert('AI 단계 추가에 실패했습니다.');
     } finally {
       setLoading(false);
     }
@@ -430,17 +488,31 @@ function TodoApp() {
               }`}
               disabled={loading}
             />
-            <button 
-              type="submit"
-              disabled={loading || !inputText.trim()}
-              className={`w-full md:w-auto px-8 py-4 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-pink-200 hover:scale-105 text-lg ${
-                loading || !inputText.trim()
-                  ? 'bg-gray-400 cursor-not-allowed' 
-                  : 'bg-gradient-to-r from-pink-400 to-pink-600 hover:from-pink-500 hover:to-pink-700'
-              } text-white`}
-            >
-              {loading ? '⏳ 처리 중...' : '✨ 추가하기'}
-            </button>
+            <div className="flex gap-2">
+              <button 
+                type="button"
+                onClick={handleAiBreakdown}
+                disabled={aiLoading || !inputText.trim()}
+                className={`px-6 py-4 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-blue-200 hover:scale-105 text-lg ${
+                  aiLoading || !inputText.trim()
+                    ? 'bg-gray-400 cursor-not-allowed' 
+                    : 'bg-gradient-to-r from-blue-400 to-blue-600 hover:from-blue-500 hover:to-blue-700'
+                } text-white`}
+              >
+                {aiLoading ? '🤖 AI 분석 중...' : '🤖 AI 분해'}
+              </button>
+              <button 
+                type="submit"
+                disabled={loading || !inputText.trim()}
+                className={`px-8 py-4 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-pink-200 hover:scale-105 text-lg ${
+                  loading || !inputText.trim()
+                    ? 'bg-gray-400 cursor-not-allowed' 
+                    : 'bg-gradient-to-r from-pink-400 to-pink-600 hover:from-pink-500 hover:to-pink-700'
+                } text-white`}
+              >
+                {loading ? '⏳ 처리 중...' : '✨ 추가하기'}
+              </button>
+            </div>
           </div>
         </div>
         </form>
@@ -554,6 +626,58 @@ function TodoApp() {
           >
             모두 삭제
           </button>
+        </div>
+      )}
+
+      {/* AI 분해 결과 표시 */}
+      {user && showAiSteps && aiSteps.length > 0 && (
+        <div className={`mt-6 p-6 rounded-2xl shadow-lg border-2 ${
+          isDarkMode 
+            ? 'bg-gray-800/80 backdrop-blur-sm border-blue-500' 
+            : 'bg-blue-50/80 backdrop-blur-sm border-blue-300'
+        }`}>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-xl font-bold text-blue-600 dark:text-blue-400">
+              🤖 AI가 분해한 단계들
+            </h3>
+            <button
+              onClick={() => setShowAiSteps(false)}
+              className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+            >
+              ✕
+            </button>
+          </div>
+          
+          <div className="space-y-3 mb-4">
+            {aiSteps.map((step, index) => (
+              <div key={index} className={`p-3 rounded-lg border-l-4 border-blue-400 ${
+                isDarkMode ? 'bg-gray-700/50' : 'bg-white/70'
+              }`}>
+                <span className="text-sm font-medium text-blue-600 dark:text-blue-400">
+                  {index + 1}.
+                </span>
+                <span className="ml-2 text-gray-800 dark:text-gray-200">
+                  {step}
+                </span>
+              </div>
+            ))}
+          </div>
+          
+          <div className="flex gap-3">
+            <button
+              onClick={addAiStepsAsTodos}
+              disabled={loading}
+              className="px-6 py-3 bg-gradient-to-r from-green-400 to-green-600 hover:from-green-500 hover:to-green-700 text-white rounded-lg font-semibold transition-all duration-300 shadow-lg hover:shadow-green-200 hover:scale-105 disabled:bg-gray-400 disabled:cursor-not-allowed"
+            >
+              {loading ? '⏳ 추가 중...' : '✅ 모든 단계를 Todo로 추가'}
+            </button>
+            <button
+              onClick={() => setShowAiSteps(false)}
+              className="px-6 py-3 bg-gray-500 hover:bg-gray-600 text-white rounded-lg font-semibold transition-all duration-300"
+            >
+              취소
+            </button>
+          </div>
         </div>
       )}
       

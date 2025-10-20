@@ -1,11 +1,13 @@
-require('dotenv').config();
-const express = require('express');
-const cors = require('cors');
-const rateLimit = require('express-rate-limit');
-const { GoogleGenerativeAI } = require('@google/generative-ai');
+import dotenv from 'dotenv';
+import express from 'express';
+import cors from 'cors';
+import rateLimit from 'express-rate-limit';
+import { GoogleGenerativeAI } from '@google/generative-ai';
+
+dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 3002;
+const PORT = process.env.PORT || 3004;
 
 // Gemini AI 초기화
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
@@ -44,8 +46,20 @@ app.post('/api/ai/generate', aiLimiter, async (req, res) => {
         // Gemini 모델 초기화 (안정적인 모델 사용)
         const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
         
-        // 프롬프트 생성
-        const fullPrompt = `사용자가 요청한 내용에 대해 도움이 되는 답변을 해주세요: ${prompt}`;
+        // 프롬프트 생성 (할 일 분해용)
+        const fullPrompt = `다음 작업을 구체적이고 실행 가능한 5개 이하의 작은 단계로 나누세요:
+"${prompt}"
+
+규칙:
+- 각 단계는 한 줄로 작성
+- 번호를 붙이지 마세요
+- 실행 가능한 동사로 시작 (예: "~하기", "~하기", "~하기")
+- 각 단계는 독립적으로 완료 가능해야 함
+- 너무 세분화하지 말고 적당한 크기로 나누기
+
+응답 형식:
+- 각 단계를 줄바꿈으로 구분
+- 추가 설명이나 번호 없이 단계만 나열`;
         
         // Gemini API 호출
         const result = await model.generateContent(fullPrompt);

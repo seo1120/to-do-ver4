@@ -7,6 +7,7 @@
 ![Supabase](https://img.shields.io/badge/Database-Supabase-green?style=for-the-badge&logo=supabase)
 ![React](https://img.shields.io/badge/Frontend-React-blue?style=for-the-badge&logo=react)
 ![Vite](https://img.shields.io/badge/Build-Vite-purple?style=for-the-badge&logo=vite)
+![AI](https://img.shields.io/badge/AI-Gemini-orange?style=for-the-badge&logo=google)
 
 **🎯 할 일을 관리하고 꿈을 이뤄가세요! 💕**
 
@@ -29,6 +30,7 @@
 - 🌙 **다크/라이트 모드** - 사용자 취향에 맞는 테마
 - ⚡ **실시간 업데이트** - 서버와 실시간 동기화
 - 💾 **클라우드 데이터 저장** - Supabase PostgreSQL로 안전한 클라우드 저장
+- 🤖 **AI 할 일 분해** - Google Gemini AI로 복잡한 할 일을 작은 단계로 자동 분해
 - 📱 **반응형 디자인** - 모든 기기에서 완벽한 경험
 - 🔄 **로딩 상태 표시** - 사용자 친화적인 피드백
 - 🛡️ **에러 처리** - 안정적인 사용자 경험
@@ -131,6 +133,12 @@ npm run dev:full
 - 📊 **상태별 필터**: 전체/진행중/완료된 항목만 보기
 - 📈 **진행률 표시**: 시각적인 완료율 표시
 
+### 🤖 AI 할 일 분해
+- 🧠 **스마트 분해**: Google Gemini AI가 복잡한 할 일을 실행 가능한 작은 단계로 자동 분해
+- 📝 **구체적인 단계**: 각 단계는 독립적으로 완료 가능한 구체적인 작업
+- ⚡ **원클릭 추가**: AI가 분해한 모든 단계를 개별 Todo로 한 번에 추가
+- 🎯 **효율적인 관리**: 큰 프로젝트를 체계적으로 관리할 수 있는 작은 작업들로 분해
+
 ### 🎨 사용자 경험
 - 🌙 **다크 모드**: 눈에 편한 다크 테마
 - 📱 **반응형**: 모바일부터 데스크톱까지
@@ -143,9 +151,10 @@ npm run dev:full
 
 ### Backend
 - **Express.js** - 빠르고 유연한 웹 프레임워크
-- **SQLite** - 경량화된 관계형 데이터베이스
+- **Supabase** - PostgreSQL 클라우드 데이터베이스
 - **CORS** - 크로스 오리진 요청 처리
 - **RESTful API** - 표준화된 API 설계
+- **Google Gemini AI** - AI 할 일 분해 기능
 
 ### Frontend
 - **React 19** - 최신 React 기능 활용
@@ -261,6 +270,10 @@ to-do-ver3/
 ## 🎨 스크린샷
 
 <div align="center">
+
+### 🤖 AI 할 일 분해 기능
+![AI 분해 기능](https://via.placeholder.com/800x500/4F46E5/FFFFFF?text=AI+Task+Breakdown+Feature)
+*복잡한 할 일을 AI가 작은 단계로 자동 분해*
 
 ### 🌞 라이트 모드
 ![Light Mode](https://via.placeholder.com/600x400/FFB6C1/FFFFFF?text=Light+Mode+Preview)
