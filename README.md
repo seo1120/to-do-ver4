@@ -307,7 +307,6 @@ npm install
 **서현** - Full Stack Developer
 
 - 🌐 GitHub: [@seo1120](https://github.com/seo1120)
-- 📧 이메일: [연락처]
 
 ---
 
