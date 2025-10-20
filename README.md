@@ -206,28 +206,6 @@ http://localhost:3002/api
 
 ---
 
-## 💾 데이터베이스 정보
-
-### SQLite 데이터베이스
-- **파일 위치**: `./todos.db`
-- **테이블 구조**:
-  ```sql
-  CREATE TABLE todos (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    text TEXT NOT NULL,
-    completed BOOLEAN DEFAULT 0,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-  );
-  ```
-
-### 데이터 관리
-- ✅ **자동 초기화**: 서버 시작 시 테이블 자동 생성
-- ✅ **영구 저장**: 서버 재시작해도 데이터 유지
-- ✅ **백업**: `todos.db` 파일 복사로 간단한 백업
-- ✅ **확장성**: VS Code SQLite 확장으로 데이터 확인 가능
-
----
-
 ## 🧪 테스트 방법
 
 ### 1️⃣ 브라우저 테스트
@@ -270,16 +248,11 @@ to-do-ver3/
 ## 🎨 스크린샷
 
 <div align="center">
+<img width="935" height="680" alt="루미의 Todo 리스트 ver4" src="https://github.com/user-attachments/assets/00c0fe50-c429-4d3f-a93d-023f13232a64" />
+<img width="717" height="588" alt="- 전체" src="https://github.com/user-attachments/assets/bcc1a36c-8d0b-472c-b283-337f6bdf3afd" />
+<img width="701" height="730" alt="앱 테스트 및 사용자 경험 개선하기" src="https://github.com/user-attachments/assets/9ae6ed1e-4503-4b3a-9f5a-d5d5dacb45c9" />
+<img width="625" height="411" alt="Ds Project 0  main" src="https://github.com/user-attachments/assets/ad83ea5f-1513-4d73-a61c-58d13abcc471" />
 
-### 🤖 AI 할 일 분해 기능
-![AI 분해 기능](https://via.placeholder.com/800x500/4F46E5/FFFFFF?text=AI+Task+Breakdown+Feature)
-*복잡한 할 일을 AI가 작은 단계로 자동 분해*
-
-### 🌞 라이트 모드
-![Light Mode](https://via.placeholder.com/600x400/FFB6C1/FFFFFF?text=Light+Mode+Preview)
-
-### 🌙 다크 모드  
-![Dark Mode](https://via.placeholder.com/600x400/2D3748/FFFFFF?text=Dark+Mode+Preview)
 
 </div>
 
@@ -320,18 +293,6 @@ npm install
 #### 4️⃣ 브라우저 캐시 문제
 - 개발자 도구 (F12) → Application → Storage → Clear storage
 - 또는 하드 새로고침 (Ctrl+Shift+R)
-
----
-
-## 🤝 기여하기
-
-프로젝트에 기여하고 싶으시다면:
-
-1. 🍴 **Fork** 이 저장소
-2. 🌿 **브랜치 생성** (`git checkout -b feature/amazing-feature`)
-3. 💾 **커밋** (`git commit -m 'Add amazing feature'`)
-4. 📤 **푸시** (`git push origin feature/amazing-feature`)
-5. 🔄 **Pull Request** 생성
 
 ---
 
