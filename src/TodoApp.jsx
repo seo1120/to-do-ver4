@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { arrayMove } from '@dnd-kit/sortable';
 import TodoList from './TodoList';
+import AuthForm from './AuthForm';
 import starImage from '/pink-dot-star96.png';
 import { todoService } from './services/todoService';
+import { authService } from './services/authService';
 
 function TodoApp() {
   const [todos, setTodos] = useState([]);
@@ -12,6 +14,38 @@ function TodoApp() {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  
+  // 인증 관련 상태
+  const [user, setUser] = useState(null);
+  const [showAuthForm, setShowAuthForm] = useState(false);
+  const [authLoading, setAuthLoading] = useState(true);
+
+  // 인증 상태 확인 및 감지
+  useEffect(() => {
+    // 초기 사용자 상태 확인
+    const checkUser = async () => {
+      const result = await authService.getCurrentUser();
+      if (result.success && result.user) {
+        setUser(result.user);
+        console.log('✅ 사용자 로그인 상태:', result.user.email);
+      } else {
+        setUser(null);
+        console.log('❌ 사용자 로그인되지 않음');
+      }
+      setAuthLoading(false);
+    };
+
+    checkUser();
+
+    // 인증 상태 변경 감지
+    const { data: { subscription } } = authService.onAuthStateChange((event, session) => {
+      console.log('🔐 인증 상태 변경:', event, session?.user?.email);
+      setUser(session?.user || null);
+      setAuthLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   // 서버에서 데이터 로드 (컴포넌트 마운트 시 한 번만)
   useEffect(() => {
@@ -31,9 +65,11 @@ function TodoApp() {
       }
     }
     
-    // 서버에서 Todo 데이터 로드
-    loadTodos();
-  }, []);
+    // 사용자가 로그인되어 있을 때만 Todo 데이터 로드
+    if (user) {
+      loadTodos();
+    }
+  }, [user]);
 
   // 서버에서 Todo 데이터 로드 함수
   const loadTodos = async () => {
@@ -211,6 +247,23 @@ function TodoApp() {
     }
   };
 
+  // 인증 관련 함수들
+  const handleAuthSuccess = () => {
+    setShowAuthForm(false);
+    // 사용자 상태는 useEffect에서 자동으로 업데이트됨
+  };
+
+  const handleLogout = async () => {
+    const result = await authService.signOut();
+    if (result.success) {
+      setUser(null);
+      setTodos([]); // 로그아웃 시 Todo 목록 초기화
+      console.log('✅ 로그아웃 성공');
+    } else {
+      console.error('❌ 로그아웃 실패:', result.error);
+    }
+  };
+
   const toggleDarkMode = () => {
     setIsDarkMode(!isDarkMode);
   };
@@ -239,18 +292,55 @@ function TodoApp() {
         : 'bg-pink-50 text-gray-900'
     }`}>
       <div className="container mx-auto p-4 md:p-8 max-w-2xl">
-        <div className="mb-8 text-center">
-          <h1 className={`text-2xl md:text-3xl font-bold mb-2 flex items-center justify-center gap-3 ${
-            isDarkMode ? 'text-white' : 'text-gray-600'
-          }`}>
-            <img 
-              src={starImage} 
-              alt="루미" 
-              className="w-8 h-8 md:w-10 md:h-10"
-            />
-            루미의 Todo 리스트 ver3 (Full Stack)
-          </h1>
-          <p className={`text-sm ${
+        <div className="mb-8">
+          {/* 로그인/로그아웃 버튼 - 오른쪽 상단 고정 */}
+          <div className="flex justify-end mb-4">
+            <div className={`px-4 py-3 rounded-xl shadow-lg ${
+              isDarkMode 
+                ? 'bg-gray-800 border border-gray-700' 
+                : 'bg-white border border-pink-200'
+            }`}>
+              {authLoading ? (
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-pink-500"></div>
+              ) : user ? (
+                <div className="flex items-center gap-4">
+                  <span className={`text-sm font-medium ${
+                    isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                  }`}>
+                    안녕하세요, {user.email.split('@')[0]}님! 👋
+                  </span>
+                  <button
+                    onClick={handleLogout}
+                    className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white text-sm rounded-lg transition-all duration-300 hover:scale-105 shadow-lg"
+                  >
+                    로그아웃
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={() => setShowAuthForm(true)}
+                  className="px-6 py-2 bg-pink-500 hover:bg-pink-600 text-white rounded-lg transition-all duration-300 hover:scale-105 shadow-lg font-medium"
+                >
+                  로그인
+                </button>
+              )}
+            </div>
+          </div>
+          
+          {/* 제목 - 가운데 정렬 */}
+          <div className="text-center">
+            <h1 className={`text-2xl md:text-3xl font-bold flex items-center justify-center gap-3 ${
+              isDarkMode ? 'text-white' : 'text-gray-600'
+            }`}>
+              <img 
+                src={starImage} 
+                alt="루미" 
+                className="w-8 h-8 md:w-10 md:h-10"
+              />
+              루미의 Todo 리스트 ver4
+            </h1>
+          </div>
+          <p className={`text-sm text-center ${
             isDarkMode ? 'text-gray-300' : 'text-gray-600'
           }`}>
             할 일을 관리하고 꿈을 이뤄가세요! 💕
@@ -287,10 +377,41 @@ function TodoApp() {
           )}
         </div>
       
-      <form onSubmit={(e) => {
-        e.preventDefault();
-        addTodo();
-      }}>
+      {/* 로그인하지 않은 경우 안내 메시지 */}
+      {!user && !authLoading && (
+        <div className={`p-8 rounded-2xl mb-6 shadow-lg text-center ${
+          isDarkMode 
+            ? 'bg-gray-800/80 backdrop-blur-sm border border-gray-700' 
+            : 'bg-white/80 backdrop-blur-sm border border-pink-200 shadow-pink-100'
+        }`}>
+          <div className="mb-6">
+            <div className="text-6xl mb-4">🔐</div>
+            <h2 className={`text-2xl font-bold mb-2 ${
+              isDarkMode ? 'text-white' : 'text-gray-800'
+            }`}>
+              Todo를 시작해보세요!
+            </h2>
+            <p className={`text-lg ${
+              isDarkMode ? 'text-gray-300' : 'text-gray-600'
+            }`}>
+              로그인하여 나만의 할 일을 관리하세요
+            </p>
+          </div>
+          <button
+            onClick={() => setShowAuthForm(true)}
+            className="px-8 py-3 bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-pink-200 hover:scale-105"
+          >
+            로그인 / 회원가입
+          </button>
+        </div>
+      )}
+
+      {/* 로그인한 사용자만 Todo 입력 폼 표시 */}
+      {user && (
+        <form onSubmit={(e) => {
+          e.preventDefault();
+          addTodo();
+        }}>
         <div className={`p-6 rounded-2xl mb-6 shadow-lg ${
           isDarkMode 
             ? 'bg-gray-800/80 backdrop-blur-sm border border-gray-700' 
@@ -307,23 +428,26 @@ function TodoApp() {
                   ? 'bg-gray-700/50 border-gray-600 text-white placeholder-gray-400' 
                   : 'bg-white/90 border-pink-200 text-gray-900 placeholder-pink-400'
               }`}
+              disabled={loading}
             />
             <button 
               type="submit"
-              disabled={loading}
-              className={`w-full md:w-auto px-6 py-3 rounded-xl font-medium transition-all duration-300 shadow-lg ${
-                loading 
+              disabled={loading || !inputText.trim()}
+              className={`w-full md:w-auto px-8 py-4 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-pink-200 hover:scale-105 text-lg ${
+                loading || !inputText.trim()
                   ? 'bg-gray-400 cursor-not-allowed' 
-                  : 'bg-pink-300 hover:bg-pink-500 hover:shadow-pink-200 hover:scale-105'
+                  : 'bg-gradient-to-r from-pink-400 to-pink-600 hover:from-pink-500 hover:to-pink-700'
               } text-white`}
             >
               {loading ? '⏳ 처리 중...' : '✨ 추가하기'}
             </button>
           </div>
         </div>
-      </form>
+        </form>
+      )}
       
-      {/* 검색 및 필터 */}
+      {/* 검색 및 필터 - 로그인한 사용자만 */}
+      {user && (
       <div className={`p-6 rounded-2xl mb-6 transition-all duration-300 shadow-lg ${
         isDarkMode 
           ? 'bg-gray-800/80 backdrop-blur-sm border border-gray-700' 
@@ -381,9 +505,10 @@ function TodoApp() {
           </button>
         </div>
       </div>
+      )}
 
-      {/* 통계 및 진행률 */}
-      {totalTodos > 0 && (
+      {/* 통계 및 진행률 - 로그인한 사용자만 */}
+      {user && totalTodos > 0 && (
         <div className={`p-6 rounded-xl mb-6 transition-all duration-300 shadow-lg ${
           isDarkMode 
             ? 'bg-gray-800/80 backdrop-blur-sm border border-gray-700' 
@@ -414,8 +539,8 @@ function TodoApp() {
         </div>
       )}
 
-      {/* 일괄 작업 버튼 */}
-      {totalTodos > 0 && (
+      {/* 일괄 작업 버튼 - 로그인한 사용자만 */}
+      {user && totalTodos > 0 && (
         <div className="flex flex-col md:flex-row gap-3 justify-center mb-6">
           <button 
             onClick={completeAll} 
@@ -432,15 +557,15 @@ function TodoApp() {
         </div>
       )}
       
-      {/* 할 일 목록 또는 빈 상태 메시지 */}
-      {todos.length === 0 ? (
+      {/* 할 일 목록 또는 빈 상태 메시지 - 로그인한 사용자만 */}
+      {user && todos.length === 0 ? (
         <div className={`text-center py-12 transition-colors ${
           isDarkMode ? 'text-gray-400' : 'text-gray-500'
         }`}>
           <p className="text-lg mb-2">📝 아직 할 일이 없습니다.</p>
           <p className="text-sm">새로운 할 일을 추가해보세요!</p>
         </div>
-      ) : (
+      ) : user ? (
         <TodoList 
           todos={filteredTodos}
           onToggle={toggleTodo}
@@ -448,7 +573,7 @@ function TodoApp() {
           onReorder={reorderTodos}
           isDarkMode={isDarkMode}
         />
-      )}
+      ) : null}
       </div>
       
       {/* 서버 재연결 버튼 - 작게 맨 밑에 */}
@@ -478,6 +603,15 @@ function TodoApp() {
       >
         {isDarkMode ? '☀️' : '🌙'}
       </button>
+
+      {/* 인증 폼 모달 */}
+      {showAuthForm && (
+        <AuthForm 
+          onAuthSuccess={handleAuthSuccess}
+          onCancel={() => setShowAuthForm(false)}
+          isDarkMode={isDarkMode}
+        />
+      )}
     </div>
   );
 }

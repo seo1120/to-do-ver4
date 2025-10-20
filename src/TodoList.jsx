@@ -75,7 +75,7 @@ function TodoList({ todos, onToggle, onDelete, onReorder, isDarkMode = false }) 
       onDragEnd={handleDragEnd}
     >
       <SortableContext items={todos.map((todo, index) => todo.id || index)} strategy={verticalListSortingStrategy}>
-        <div className="grid grid-cols-1 gap-3">
+        <div className="grid grid-cols-1 gap-6">
           {todos.map((todo, index) => (
             <SortableTodoItem
               key={todo.id || index}

@@ -1,57 +1,35 @@
-import axios from 'axios';
+import { createClient } from '@supabase/supabase-js';
 
-// API 기본 URL 설정
-const API_BASE_URL = 'http://localhost:3002/api';
+// Supabase 클라이언트 설정
+const SUPABASE_URL = 'https://yshceldkcxsnmvofmenp.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlzaGNlbGRrY3hzbm12b2ZtZW5wIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAzODMyNzksImV4cCI6MjA3NTk1OTI3OX0.vyAyB7ElpHZFThFDxBXFv0ga86vGTqteUBO1EzUDPZM';
 
-// axios 인스턴스 생성
-const apiClient = axios.create({
-  baseURL: API_BASE_URL,
-  timeout: 5000,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
-
-// 요청 인터셉터 (요청 전 로깅)
-apiClient.interceptors.request.use(
-  (config) => {
-    console.log(`🚀 API 요청: ${config.method?.toUpperCase()} ${config.url}`);
-    return config;
-  },
-  (error) => {
-    console.error('❌ API 요청 에러:', error);
-    return Promise.reject(error);
-  }
-);
-
-// 응답 인터셉터 (응답 후 로깅)
-apiClient.interceptors.response.use(
-  (response) => {
-    console.log(`✅ API 응답: ${response.status} ${response.config.url}`);
-    return response;
-  },
-  (error) => {
-    console.error('❌ API 응답 에러:', error.response?.status, error.message);
-    return Promise.reject(error);
-  }
-);
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // Todo API 서비스 함수들
 export const todoService = {
   // 전체 Todo 조회
   async getAllTodos() {
     try {
-      const response = await apiClient.get('/todos');
+      console.log('🚀 Supabase 요청: 전체 Todo 조회');
+      const { data, error } = await supabase
+        .from('todos')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      console.log('✅ Supabase 응답: Todo 조회 성공');
       return {
         success: true,
-        data: response.data.data,
-        count: response.data.count
+        data: data,
+        count: data.length
       };
     } catch (error) {
-      console.error('Todo 조회 실패:', error);
+      console.error('❌ Todo 조회 실패:', error);
       return {
         success: false,
-        error: error.response?.data?.error || 'Todo 조회에 실패했습니다'
+        error: error.message || 'Todo 조회에 실패했습니다'
       };
     }
   },
@@ -59,17 +37,37 @@ export const todoService = {
   // 새 Todo 추가
   async createTodo(text) {
     try {
-      const response = await apiClient.post('/todos', { text });
+      console.log('🚀 Supabase 요청: 새 Todo 생성');
+      
+      // 현재 사용자 정보 가져오기
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      if (userError || !user) {
+        throw new Error('사용자 인증이 필요합니다');
+      }
+
+      const { data, error } = await supabase
+        .from('todos')
+        .insert([{ 
+          text: text.trim(), 
+          completed: false,
+          user_id: user.id 
+        }])
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      console.log('✅ Supabase 응답: Todo 생성 성공');
       return {
         success: true,
-        data: response.data.data,
-        message: response.data.message
+        data: data,
+        message: 'Todo가 생성되었습니다'
       };
     } catch (error) {
-      console.error('Todo 생성 실패:', error);
+      console.error('❌ Todo 생성 실패:', error);
       return {
         success: false,
-        error: error.response?.data?.error || 'Todo 생성에 실패했습니다'
+        error: error.message || 'Todo 생성에 실패했습니다'
       };
     }
   },
@@ -77,17 +75,27 @@ export const todoService = {
   // Todo 수정 (완료 상태 토글 또는 텍스트 수정)
   async updateTodo(id, updates) {
     try {
-      const response = await apiClient.put(`/todos/${id}`, updates);
+      console.log('🚀 Supabase 요청: Todo 수정');
+      const { data, error } = await supabase
+        .from('todos')
+        .update(updates)
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      console.log('✅ Supabase 응답: Todo 수정 성공');
       return {
         success: true,
-        data: response.data.data,
-        message: response.data.message
+        data: data,
+        message: 'Todo가 수정되었습니다'
       };
     } catch (error) {
-      console.error('Todo 수정 실패:', error);
+      console.error('❌ Todo 수정 실패:', error);
       return {
         success: false,
-        error: error.response?.data?.error || 'Todo 수정에 실패했습니다'
+        error: error.message || 'Todo 수정에 실패했습니다'
       };
     }
   },
@@ -95,16 +103,24 @@ export const todoService = {
   // Todo 삭제
   async deleteTodo(id) {
     try {
-      await apiClient.delete(`/todos/${id}`);
+      console.log('🚀 Supabase 요청: Todo 삭제');
+      const { error } = await supabase
+        .from('todos')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+
+      console.log('✅ Supabase 응답: Todo 삭제 성공');
       return {
         success: true,
         message: 'Todo가 삭제되었습니다'
       };
     } catch (error) {
-      console.error('Todo 삭제 실패:', error);
+      console.error('❌ Todo 삭제 실패:', error);
       return {
         success: false,
-        error: error.response?.data?.error || 'Todo 삭제에 실패했습니다'
+        error: error.message || 'Todo 삭제에 실패했습니다'
       };
     }
   },

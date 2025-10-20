@@ -60,16 +60,23 @@
 프로젝트 루트에 `.env` 파일을 생성하고 다음 내용을 입력하세요:
 
 ```bash
-# .env.example 파일을 .env로 복사
-cp .env.example .env
+# .env 파일 생성
+touch .env
 ```
 
 `.env` 파일에서 Supabase URL과 키를 실제 값으로 수정하세요:
 ```env
-SUPABASE_URL=your_supabase_project_url
-SUPABASE_ANON_KEY=your_supabase_anon_key
-SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
+# Server Configuration
 PORT=3002
+
+# Supabase Configuration
+VITE_SUPABASE_URL=your_supabase_project_url
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+
+# AI API Keys (선택사항 - LLM 기능 사용 시)
+# OPENAI_API_KEY=your_openai_api_key_here
+# GEMINI_API_KEY=your_gemini_api_key_here
+# HUGGINGFACE_API_KEY=your_huggingface_api_key_here
 ```
 
 ### ⚡ 1분 만에 실행하기
@@ -89,11 +96,17 @@ cp .env.example .env
 # 4️⃣ Supabase 테이블 생성
 # supabase-setup.sql 파일을 Supabase SQL Editor에서 실행
 
-# 5️⃣ 백엔드 서버 실행 (터미널 1)
-node server.js
+# 5️⃣ 의존성 설치 (새로운 패키지들)
+npm install
 
-# 6️⃣ 프론트엔드 실행 (터미널 2)
+# 6️⃣ 백엔드 서버 실행 (터미널 1)
+npm run server
+
+# 7️⃣ 프론트엔드 실행 (터미널 2)
 npm run dev
+
+# 또는 한 번에 실행 (터미널 1개)
+npm run dev:full
 ```
 
 🎉 **완료!** 이제 http://localhost:3001 에서 앱을 확인하세요!
@@ -101,6 +114,7 @@ npm run dev
 **📍 접속 주소:**
 - 🌐 **프론트엔드**: http://localhost:3001
 - 🔧 **백엔드 API**: http://localhost:3002/api/todos
+- 🤖 **AI API**: http://localhost:3002/api/ai/generate
 
 ---
 
@@ -162,6 +176,8 @@ http://localhost:3002/api
 | `POST` | `/todos` | 새 Todo 생성 | `{"text": "할 일"}` |
 | `PUT` | `/todos/:id` | Todo 수정 | `{"completed": true}` |
 | `DELETE` | `/todos/:id` | Todo 삭제 | - |
+| `POST` | `/ai/generate` | AI 텍스트 생성 | `{"prompt": "프롬프트"}` |
+| `GET` | `/health` | 서버 상태 확인 | - |
 
 ### 📝 응답 예시
 
